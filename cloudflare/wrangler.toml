@@ -6,3 +6,4 @@ workers_dev = true
 [vars]
 RADAR_NAME = "MemeCoin AI Radar Pro"
 # Never put BOT_TOKEN, TELEGRAM_OWNER_ID, WEBHOOK_SECRET or DATABASE_URL in vars.
+# Initial Cloudflare Git deployment
