@@ -1,0 +1,33 @@
+
+name: Stage 3 - Neon Save Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  save-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Radar and Neon driver
+        run: python -m pip install -e ".[neon]"
+
+      - name: Scan and save results to Neon
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SEND_RESEARCH_REPORTS: 'false'
+        run: |
+          python -m radar.service --mode live --rpc-check --max-candidates 1 --require-database
