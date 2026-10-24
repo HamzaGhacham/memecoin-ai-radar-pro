@@ -1,0 +1,37 @@
+
+name: Stage 1 - Helius Security Smoke Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install project
+        run: python -m pip install -e .
+
+      - name: Validate Helius RPC URL
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+        run: |
+          python -c "import os, urllib.parse; u=urllib.parse.urlparse(os.getenv('SOLANA_RPC_URL','')); assert u.scheme=='https' and u.netloc, 'Invalid HTTPS RPC URL'; print('RPC URL format OK')"
+
+      - name: Run real Solana security checks
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+        run: |
+          python -m radar --mode live --rpc-check --holder-check --owner-check --pool-check --max-candidates 1
