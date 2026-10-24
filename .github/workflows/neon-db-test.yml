@@ -1,0 +1,62 @@
+
+name: Stage 2 - Neon Database Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  neon-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PostgreSQL driver
+        run: python -m pip install "psycopg[binary]"
+
+      - name: Test Neon connection and tables
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python - <<'PY'
+          import os
+          import psycopg
+
+          expected = {
+              "scan_runs", "observations", "watchlist",
+              "pending_jobs", "alerts_outbox"
+          }
+
+          try:
+              with psycopg.connect(
+                  os.environ["DATABASE_URL"],
+                  connect_timeout=12
+              ) as conn:
+                  with conn.cursor() as cur:
+                      cur.execute(
+                          "SELECT table_name FROM information_schema.tables "
+                          "WHERE table_schema = 'public'"
+                      )
+                      found = {row[0] for row in cur.fetchall()}
+
+              missing = expected - found
+              if missing:
+                  print("Missing tables:", sorted(missing))
+                  raise SystemExit(1)
+
+              print("NEON CONNECTION: SUCCESS")
+              print("SCHEMA VALIDATION: SUCCESS")
+              print("TABLES FOUND: 5/5")
+
+          except psycopg.Error as exc:
+              print("DATABASE TEST FAILED:", type(exc).__name__)
+              raise SystemExit(1)
+          PY
