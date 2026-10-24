@@ -1,0 +1,8 @@
+name = "memecoin-radar-telegram"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+RADAR_NAME = "MemeCoin AI Radar Pro"
+# Never put BOT_TOKEN, TELEGRAM_OWNER_ID, WEBHOOK_SECRET or DATABASE_URL in vars.

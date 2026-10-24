@@ -1,0 +1,23 @@
+name: Stage 0 - bounded read-only API smoke test
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_read_only:
+        description: 'Type YES to run one bounded live market-data request'
+        required: true
+        default: 'NO'
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: ${{ inputs.confirm_read_only == 'YES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e .
+      - run: python -m radar --mode live --max-candidates 2
+# Deliberately NO schedule, no Telegram, no external database writes.

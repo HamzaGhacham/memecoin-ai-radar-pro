@@ -1,0 +1,72 @@
+{
+  "version": "strict-v1.0",
+  "chain": "solana",
+  "discovery": {
+    "early": {
+      "age_min_minutes": 5,
+      "age_max_minutes": 360,
+      "liquidity_usd_min": 15000,
+      "volume_5m_usd_min": 3000,
+      "trades_5m_min": 15,
+      "buy_sell_count_ratio_min": 1.2,
+      "volume_acceleration_min": 1.5,
+      "opportunity_score_min": 75
+    },
+    "momentum": {
+      "age_min_minutes": 360,
+      "age_max_minutes": 43200,
+      "liquidity_usd_min": 50000,
+      "volume_1h_usd_min": 50000,
+      "trades_1h_min": 100,
+      "price_change_1h_min_pct": 10,
+      "volume_acceleration_min": 1.5,
+      "opportunity_score_min": 80
+    }
+  },
+  "security": {
+    "risk_pass_max": 35,
+    "risk_watch_max": 60,
+    "data_coverage_min_pct": 85,
+    "mandatory_checks": [
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "C05",
+      "C06",
+      "C07",
+      "C08",
+      "C09",
+      "C10",
+      "L02",
+      "L07",
+      "L08",
+      "W01",
+      "W02",
+      "T01",
+      "T04"
+    ],
+    "weights_pct": {
+      "contract": 30,
+      "liquidity": 25,
+      "holders": 20,
+      "execution": 15,
+      "developer_identity": 10
+    }
+  },
+  "signal_confirmation": {
+    "distinct_valid_observations": 2,
+    "opportunity_coverage_min_pct": 80
+  },
+  "budget": {
+    "geckoterminal_requests_per_run": 2,
+    "dexscreener_requests_per_run": 3,
+    "rpc_requests_per_run": 3,
+    "max_candidates_per_run": 3
+  },
+  "mode": {
+    "read_only": true,
+    "auto_trading_enabled": false,
+    "alerts_enabled": false
+  }
+}

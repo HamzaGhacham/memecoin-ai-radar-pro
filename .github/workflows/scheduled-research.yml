@@ -1,0 +1,32 @@
+name: Radar research scan (strict, informational only)
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: radar-scan
+  cancel-in-progress: false
+jobs:
+  research:
+    # Only enable after DATABASE_URL and SOLANA_RPC_URL secrets configured;
+    # no opportunity alerts or automated trades regardless of configuration.
+    if: ${{ vars.RADAR_SCHEDULE_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package and Neon adapter
+        run: python -m pip install -e '.[neon]'
+      - name: Run preselected candidate research (always hold unknown security)
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_OWNER_ID: ${{ secrets.TELEGRAM_OWNER_ID }}
+          SEND_RESEARCH_REPORTS: 'false'
+        run: python -m radar.service --mode live --rpc-check --max-candidates 1 --require-database

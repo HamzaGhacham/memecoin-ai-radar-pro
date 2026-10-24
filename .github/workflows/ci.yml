@@ -1,0 +1,26 @@
+name: CI - safe offline checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install local project
+        run: python -m pip install -e .
+      - name: Unit tests (no network)
+        run: python -m unittest discover -s tests -q
+      - name: Local fixture smoke test
+        run: python -m radar --mode demo
+      - name: Integration dry run with SQLite
+        run: python -m radar.service --mode demo --database-url /tmp/radar.db
+      - name: Cloudflare JavaScript syntax
+        run: node --check cloudflare/src/index.js
